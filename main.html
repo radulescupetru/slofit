@@ -1,0 +1,105 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>jQuery UI Slider - Range slider</title>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <link rel="stylesheet" href="js/jquery.range.css">
+        <script src="js/jquery.range.js"></script>
+        <script src='js/sql.js'></script>
+
+
+        <script>
+            $( function() {
+                $('.range-slider-age').jRange({
+                    from: 0,
+                    to: 100,
+                    step: 1,
+                    scale: [0,25,50,75,100],
+                    format: '%s',
+                    width: 300,
+                    showLabels: true,
+                    isRange : true
+                });
+                $('.range-slider-height').jRange({
+                    from: 0,
+                    to: 100,
+                    step: 1,
+                    scale: [0,25,50,75,100],
+                    format: '%s',
+                    width: 300,
+                    showLabels: true,
+                    isRange : true
+                });
+                $('.range-slider-year').jRange({
+                    from: 2006,
+                    to: 2012,
+                    step: 1,
+                    scale: [2006,2007,2008,2009,2010,2011,2012],
+                    format: '%s',
+                    width: 300,
+                    showLabels: true,
+                    isRange : true
+                });
+            });
+
+            function get_age(){
+                return $('.range-slider-age').val().split(",")
+            }
+            function get_year(){
+                return $('.range-slider-year').val().split(",")
+            }
+            function get_height(){
+                return $('.range-slider-height').val().split(",")
+            }
+
+            function exc(){
+                percentage_by_features(1,get_height()[0],get_height()[1],get_age()[0],get_age()[1],get_year()[0],get_year()[1])
+            }
+
+            function percentage_by_features(sex,height_lower,height_upper,age_lower,age_upper,year_lower,year_upper){
+
+                if(sex==1){
+
+                    sql = 'SELECT sex,age_yrs,BMI from patients_new where age_yrs between '+age_lower+' and '+age_upper+' and height between '+height_lower+' and '+height_upper+' and year between '+year_lower+' and '+year_upper+' and sex=1'
+                    console.log(sql)
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', 'db/slofit.db', true);
+                    xhr.responseType = 'arraybuffer';
+                    xhr.onload = function(e) {
+                        var uInt8Array = new Uint8Array(this.response);
+                        var db = new SQL.Database(uInt8Array);
+                        var contents = db.exec(sql);
+                        console.log(contents)
+                    };
+                    xhr.send();
+                }
+
+            }
+        </script>
+    </head>
+    <body>
+        <div class="demo-section">
+            <div class="demo-code">
+
+            </div>
+            <div class="demo-output" style="padding: 20px">
+                <p>Age</p>
+                <input class="range-slider-age" type="hidden" value="25,75"/>
+            </div>
+            <div class="demo-output" style="padding: 20px">
+                <p>height</p>
+                <input class="range-slider-height" type="hidden" value="25,75"/>
+            </div>
+            <div class="demo-output" style="padding: 20px">
+                <p>Year</p>
+                <input class="range-slider-year" type="hidden" value="25,75"/>
+            </div>
+        </div>
+
+        <button onclick="exc()">Test</button>
+
+    </body>
+</html>
